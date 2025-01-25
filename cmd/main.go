@@ -10,6 +10,10 @@ import (
 	"github.com/c-santos/go-auth/internal/config"
 )
 
+type Verify struct {
+	AccessToken string `json:"access_token"`
+}
+
 func main() {
 	port := config.LoadConfig().Port
 
@@ -44,6 +48,45 @@ func main() {
 
 		response := map[string]string{
 			"access_token": token,
+		}
+
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+	})
+
+	mux.HandleFunc("/verify", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s", r.Method, r.URL)
+
+		if r.Method != "POST" {
+			w.WriteHeader(404)
+			return
+		}
+
+		var body Verify
+
+		err := json.NewDecoder(r.Body).Decode(&body)
+		if err != nil || body.AccessToken == "" {
+			w.WriteHeader(400)
+			return
+		}
+
+		claims, err := auth.VerifyToken(body.AccessToken)
+		if err != nil {
+			w.WriteHeader(401)
+			return
+		}
+
+		exp, err := claims.GetExpirationTime()
+		if err != nil {
+			w.WriteHeader(500)
+			return
+		}
+
+		response := map[string]interface{}{
+			"exp": *exp,
 		}
 
 		err = json.NewEncoder(w).Encode(response)
