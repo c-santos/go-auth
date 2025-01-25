@@ -30,3 +30,18 @@ func GenerateToken(data map[string]string) (string, error) {
 
 	return signedToken, nil
 }
+
+func VerifyToken(tokenStr string) (jwt.MapClaims, error) {
+	key := config.LoadConfig().JWTSecret
+
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		return []byte(key), nil
+	})
+
+	if err != nil || !token.Valid {
+		log.Printf("[auth.go] verify: %s", err)
+		return nil, err
+	}
+
+	return token.Claims.(jwt.MapClaims), nil
+}
