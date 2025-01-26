@@ -8,6 +8,7 @@ import (
 
 	"github.com/c-santos/go-auth/internal/auth"
 	"github.com/c-santos/go-auth/internal/config"
+	"github.com/c-santos/go-auth/internal/middleware"
 )
 
 type Verify struct {
@@ -99,7 +100,7 @@ func main() {
 
 	server := &http.Server{
 		Addr: ":"+port,
-		Handler: router,
+		Handler: middleware.Logger(router),
 	}
 
 	log.Printf("Listening on PORT %s", port)
