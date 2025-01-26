@@ -25,8 +25,6 @@ func main() {
 	})
 
 	router.HandleFunc("POST /token", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s", r.Method, r.URL)
-
 		if r.Method != "POST" {
 			w.WriteHeader(404)
 			return
@@ -59,8 +57,6 @@ func main() {
 	})
 
 	router.HandleFunc("POST /verify", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("%s %s", r.Method, r.URL)
-
 		if r.Method != "POST" {
 			w.WriteHeader(404)
 			return
