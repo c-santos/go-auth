@@ -6,29 +6,56 @@ import (
 
 	"github.com/c-santos/go-auth/internal/config"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
-func GenerateToken(data map[string]string) (string, error) {
+type Tokens struct {
+	AccessToken  string
+	RefreshToken string
+}
+
+func GenerateToken(data map[string]string) (Tokens, error) {
 	key := config.LoadConfig().JWTSecret
 
 	claims := jwt.MapClaims{
 		"data": data,
 		"exp":  time.Now().Add(15 * time.Minute).Unix(),
+		"jid":  uuid.New(),
+		"sub":  uuid.New(),
 	}
 
-	token := jwt.NewWithClaims(
+	refreshClaims := jwt.MapClaims{
+		"data": data,
+		"exp":  time.Now().Add(60 * time.Minute).Unix(),
+		"jid":  uuid.New(),
+		"sub":  uuid.New(),
+	}
+
+	accessToken := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		claims,
 	)
 
-	signedToken, err := token.SignedString([]byte(key))
-	if err != nil {
-		log.Printf("[auth.go] Failed to sign token. %s", err)
-		return "", err
-	}
-	log.Printf("[auth.go] Generated token: %s", signedToken)
+	refreshToken := jwt.NewWithClaims(
+		jwt.SigningMethodHS256,
+		refreshClaims,
+	)
 
-	return signedToken, nil
+	signedAccessToken, err := accessToken.SignedString([]byte(key))
+	if err != nil {
+		log.Printf("[auth.go] Failed to sign access token. %s", err)
+		return Tokens{}, err
+	}
+	log.Printf("[auth.go] Generated access token: %s", signedAccessToken)
+
+	signedRefreshToken, err := refreshToken.SignedString([]byte(key))
+	if err != nil {
+		log.Printf("[auth.go] Failed to refresh sign token. %s", err)
+		return Tokens{}, err
+	}
+	log.Printf("[auth.go] Generated refresh token: %s", signedRefreshToken)
+
+	return Tokens{AccessToken: signedAccessToken, RefreshToken: signedRefreshToken}, nil
 }
 
 func VerifyToken(tokenStr string) (jwt.MapClaims, error) {
@@ -44,8 +71,4 @@ func VerifyToken(tokenStr string) (jwt.MapClaims, error) {
 	}
 
 	return token.Claims.(jwt.MapClaims), nil
-}
-
-func RefreshToken() {
-
 }

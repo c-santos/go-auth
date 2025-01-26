@@ -46,7 +46,8 @@ func main() {
 		}
 
 		response := map[string]string{
-			"access_token": token,
+			"access_token":  token.AccessToken,
+			"refresh_token": token.RefreshToken,
 		}
 
 		err = json.NewEncoder(w).Encode(response)
@@ -93,9 +94,8 @@ func main() {
 		}
 	})
 
-
 	server := &http.Server{
-		Addr: ":"+port,
+		Addr:    ":" + port,
 		Handler: middleware.Logger(router),
 	}
 
