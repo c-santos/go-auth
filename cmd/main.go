@@ -17,13 +17,13 @@ type Verify struct {
 func main() {
 	port := config.LoadConfig().Port
 
-	mux := &http.ServeMux{}
+	router := http.NewServeMux()
 
-	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, I am running on %q", port)
 	})
 
-	mux.HandleFunc("POST /token", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("POST /token", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s", r.Method, r.URL)
 
 		if r.Method != "POST" {
@@ -57,7 +57,7 @@ func main() {
 		}
 	})
 
-	mux.HandleFunc("POST /verify", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("POST /verify", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s", r.Method, r.URL)
 
 		if r.Method != "POST" {
@@ -96,6 +96,12 @@ func main() {
 		}
 	})
 
+
+	server := &http.Server{
+		Addr: ":"+port,
+		Handler: router,
+	}
+
 	log.Printf("Listening on PORT %s", port)
-	log.Fatal(http.ListenAndServe(":"+port, mux))
+	log.Fatal(server.ListenAndServe())
 }
