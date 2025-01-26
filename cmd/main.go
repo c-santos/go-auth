@@ -19,11 +19,11 @@ func main() {
 
 	mux := &http.ServeMux{}
 
-	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, I am running on %q", port)
 	})
 
-	mux.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST /token", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s", r.Method, r.URL)
 
 		if r.Method != "POST" {
@@ -57,7 +57,7 @@ func main() {
 		}
 	})
 
-	mux.HandleFunc("/verify", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST /verify", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("%s %s", r.Method, r.URL)
 
 		if r.Method != "POST" {
