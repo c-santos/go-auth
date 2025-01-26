@@ -63,7 +63,7 @@ func main() {
 			return
 		}
 
-		var body Verify
+		var body auth.Tokens
 
 		err := json.NewDecoder(r.Body).Decode(&body)
 		if err != nil || body.AccessToken == "" {
@@ -71,7 +71,7 @@ func main() {
 			return
 		}
 
-		claims, err := auth.VerifyToken(body.AccessToken)
+		claims, err := auth.VerifyToken(body)
 		if err != nil {
 			w.WriteHeader(401)
 			return

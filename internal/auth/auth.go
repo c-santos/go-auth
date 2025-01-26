@@ -58,16 +58,19 @@ func GenerateToken(data map[string]string) (Tokens, error) {
 	return Tokens{AccessToken: signedAccessToken, RefreshToken: signedRefreshToken}, nil
 }
 
-func VerifyToken(tokenStr string) (jwt.MapClaims, error) {
+func VerifyToken(tokens Tokens) (jwt.MapClaims, error) {
 	key := config.LoadConfig().JWTSecret
 
-	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+	// If access token is valid, return claim 
+	// If access token invalid, verify refresh token 
+	// If refresh token valid, generate new access token and return along with refresh token
+	// If refresh token invalid, return 401
+
+	token, err := jwt.Parse(tokens.AccessToken, func(t *jwt.Token) (interface{}, error) {
 		return []byte(key), nil
 	})
-
-	if err != nil || !token.Valid {
-		log.Printf("[auth.go] verify: %s", err)
-		return nil, err
+	if err == nil || token.Valid {
+		return token.Claims.(jwt.MapClaims), nil
 	}
 
 	return token.Claims.(jwt.MapClaims), nil
