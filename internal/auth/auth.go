@@ -45,3 +45,7 @@ func VerifyToken(tokenStr string) (jwt.MapClaims, error) {
 
 	return token.Claims.(jwt.MapClaims), nil
 }
+
+func RefreshToken() {
+
+}
