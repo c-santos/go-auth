@@ -46,14 +46,14 @@ func GenerateToken(data map[string]string) (Tokens, error) {
 		log.Printf("[auth.go] Failed to sign access token. %s", err)
 		return Tokens{}, err
 	}
-	log.Printf("[auth.go] Generated access token: %s", signedAccessToken)
+	log.Println("[auth.go] Succesfully generated access token.")
 
 	signedRefreshToken, err := refreshToken.SignedString([]byte(key))
 	if err != nil {
 		log.Printf("[auth.go] Failed to refresh sign token. %s", err)
 		return Tokens{}, err
 	}
-	log.Printf("[auth.go] Generated refresh token: %s", signedRefreshToken)
+	log.Println("[auth.go] Succesfully generated access token.")
 
 	return Tokens{AccessToken: signedAccessToken, RefreshToken: signedRefreshToken}, nil
 }
