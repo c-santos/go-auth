@@ -82,7 +82,7 @@ func main() {
 			return
 		}
 
-		response := map[string]interface{}{
+		response := map[string]any {
 			"exp": *exp,
 		}
 
@@ -93,9 +93,8 @@ func main() {
 		}
 	})
 
-
 	server := &http.Server{
-		Addr: ":"+port,
+		Addr:    ":" + port,
 		Handler: middleware.Logger(router),
 	}
 
